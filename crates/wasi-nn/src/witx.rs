@@ -10,6 +10,7 @@ wiggle::from_witx!({
 });
 
 use types::NnErrno;
+use crate::r#impl::UsageError;
 
 impl<'a> types::UserErrorConversion for WasiNnCtx {
     fn nn_errno_from_wasi_nn_error(&mut self, e: WasiNnError) -> Result<NnErrno> {
@@ -17,7 +18,10 @@ impl<'a> types::UserErrorConversion for WasiNnCtx {
         match e {
             WasiNnError::BackendError(_) => unimplemented!(),
             WasiNnError::GuestError(_) => unimplemented!(),
-            WasiNnError::UsageError(_) => unimplemented!(),
+            WasiNnError::UsageError(ue) => match ue {
+                UsageError::ModelNotFound(model_name) => Ok(NnErrno::ModelNotFound),
+                _ => Ok(NnErrno::InvalidArgument)
+            },
         }
     }
 }
