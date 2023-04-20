@@ -278,16 +278,6 @@ pub struct StringArray {
     elems: Vec<String>,
 }
 
-#[derive(Debug, thiserror::Error)]
-pub enum StringArrayError {
-    #[error("Number of elements exceeds 2^32")]
-    NumberElements,
-    #[error("Element size exceeds 2^32")]
-    ElementSize,
-    #[error("Cumulative size exceeds 2^32")]
-    CumulativeSize,
-}
-
 impl StringArray {
     pub fn new() -> Self {
         StringArray { elems: Vec::new() }
