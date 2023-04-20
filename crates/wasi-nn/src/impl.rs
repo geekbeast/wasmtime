@@ -188,10 +188,14 @@ impl<'a> WasiEphemeralNn for WasiNnCtx {
         let json = serde_json::to_string(&output).unwrap();
         let response_bytes = json.as_bytes();
         let response_buffer = response.as_array(max_response_size);
-        response_buffer.copy_from_slice(response_bytes);
+        let response_length = response_bytes.len() as u32;
         response_buffer
-            .get(response_bytes.len() as u32)
-            .ok_or(UsageError::NotEnoughMemory(response_bytes.len() as u32))?
+            .get_range(0..response_length)
+            .ok_or(UsageError::InvalidContext)?
+            .copy_from_slice(response_bytes);
+        response_buffer
+            .get(response_length)
+            .ok_or(UsageError::NotEnoughMemory(response_length))?
             .write(0)?;
         Ok(conversation_id.as_u64_pair())
     }
@@ -215,10 +219,14 @@ impl<'a> WasiEphemeralNn for WasiNnCtx {
         let json = serde_json::to_string(&output).unwrap();
         let response_bytes = json.as_bytes();
         let response_buffer = response.as_array(max_response_size);
-        response_buffer.copy_from_slice(response_bytes);
+        let response_length = response_bytes.len() as u32;
         response_buffer
-            .get(response_bytes.len() as u32)
-            .ok_or(UsageError::NotEnoughMemory(response_bytes.len() as u32))?
+            .get_range(0..response_length)
+            .ok_or(UsageError::InvalidContext)?
+            .copy_from_slice(response_bytes);
+        response_buffer
+            .get(response_length)
+            .ok_or(UsageError::NotEnoughMemory(response_length))?
             .write(0)?;
         Ok(())
     }
